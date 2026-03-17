@@ -22,6 +22,8 @@
 #include <fastdds/rtps/attributes/RTPSParticipantAttributes.hpp>
 #include <fastdds/rtps/common/PortParameters.hpp>
 
+#include <fastdds/dds/log/Log.hpp>
+
 #include <rtps/attributes/ServerAttributes.hpp>
 #include <utils/SystemInfo.hpp>
 
@@ -293,6 +295,8 @@ bool load_environment_server_info(
                             if (++it != mr.cend())
                             {
                                 std::string domain_name = it->str();
+                                EPROSIMA_LOG_INFO(SERVER_CLIENT_DISCOVERY,
+                                        "Resolving discovery server DNS name: " << domain_name);
                                 std::set<std::string> ipv4, ipv6;
                                 std::tie(ipv4, ipv6) = IPLocator::resolveNameDNS(domain_name);
 
@@ -316,6 +320,9 @@ bool load_environment_server_info(
                                     }
 
                                     process_port(port, server_locator);
+                                    EPROSIMA_LOG_INFO(SERVER_CLIENT_DISCOVERY,
+                                            "Discovery server '" << domain_name
+                                                    << "' resolved to UDPv4 locator " << server_locator);
                                     flist.push_front(server_locator);
                                 }
 
@@ -332,6 +339,9 @@ bool load_environment_server_info(
                                     }
 
                                     process_port(port, server_locator);
+                                    EPROSIMA_LOG_INFO(SERVER_CLIENT_DISCOVERY,
+                                            "Discovery server '" << domain_name
+                                                    << "' resolved to UDPv6 locator " << server_locator);
                                     flist.push_front(server_locator);
                                 }
                             }
@@ -385,6 +395,8 @@ bool load_environment_server_info(
                             if (++it != mr.cend())
                             {
                                 std::string domain_name = it->str();
+                                EPROSIMA_LOG_INFO(SERVER_CLIENT_DISCOVERY,
+                                        "Resolving TCP discovery server DNS name: " << domain_name);
                                 std::set<std::string> ipv4, ipv6;
                                 std::tie(ipv4, ipv6) = IPLocator::resolveNameDNS(domain_name);
 

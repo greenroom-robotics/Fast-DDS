@@ -287,10 +287,17 @@ bool IPFinder::getIPs(
         info_IP info;
         if (parseIfaddr(ifa, info, return_loopback))
         {
+            EPROSIMA_LOG_INFO(IP_FINDER,
+                    "Discovered interface " << info.dev << " with address " << info.name
+                            << " (type: " << (info.type == IP4 ? "IPv4" :
+                    info.type == IP6 ? "IPv6" :
+                    info.type == IP4_LOCAL ? "IPv4_LOCAL" : "IPv6_LOCAL") << ")");
             vec_name->push_back(info);
         }
     }
 
+    EPROSIMA_LOG_INFO(IP_FINDER,
+            "Interface enumeration complete: " << vec_name->size() << " interfaces found");
     freeifaddrs(ifaddr);
     return true;
 }

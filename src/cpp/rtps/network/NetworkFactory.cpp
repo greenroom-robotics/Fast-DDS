@@ -24,6 +24,8 @@
 #include <fastdds/utils/IPFinder.hpp>
 #include <fastdds/utils/IPLocator.hpp>
 
+#include <fastdds/dds/log/Log.hpp>
+
 #include <rtps/network/NetworkConfiguration.hpp>
 #include <rtps/transport/TCPTransportInterface.h>
 
@@ -148,9 +150,17 @@ bool NetworkFactory::RegisterTransport(
 
         if (transport->init(properties, max_msg_size_no_frag))
         {
+            EPROSIMA_LOG_INFO(RTPS_NETWORK,
+                    "Registered transport kind=" << kind
+                            << " localhost_allowed=" << is_localhost_allowed);
             minSendBufferSize = transport->get_configuration()->min_send_buffer_size();
             mRegisteredTransports.emplace_back(std::move(transport));
             wasRegistered = true;
+        }
+        else
+        {
+            EPROSIMA_LOG_WARNING(RTPS_NETWORK,
+                    "Failed to initialize transport kind=" << kind);
         }
 
         if (wasRegistered)
@@ -354,7 +364,10 @@ bool NetworkFactory::generate_locators(
     {
         loc.kind = locator_kind;
         loc.port = physical_port;
+        EPROSIMA_LOG_INFO(RTPS_NETWORK, "Generated locator " << loc);
     }
+    EPROSIMA_LOG_INFO(RTPS_NETWORK,
+            "Generated " << ret_locators.size() << " locators for port " << physical_port);
     return !ret_locators.empty();
 }
 

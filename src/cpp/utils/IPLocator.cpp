@@ -110,12 +110,14 @@ bool IPLocator::setIPv4(
     if (!IPLocator::isIPv4(s))
     {
         // Attempt DNS resolution
+        EPROSIMA_LOG_INFO(IP_LOCATOR, "Resolving hostname '" << s << "' via DNS for IPv4");
         auto response = IPLocator::resolveNameDNS(s);
 
         // Use the first valid IPv4 address that we can find
         if (response.first.size() > 0)
         {
             s = response.first.begin()->data();
+            EPROSIMA_LOG_INFO(IP_LOCATOR, "Hostname '" << ipv4 << "' resolved to IPv4: " << s);
             // Redundant check for extra security (here a custom regex is used instead of asio's verification)
             if (!IPLocator::isIPv4(s))
             {
@@ -289,12 +291,14 @@ bool IPLocator::setIPv6(
     if (!IPLocator::isIPv6(s))
     {
         // Attempt DNS resolution
+        EPROSIMA_LOG_INFO(IP_LOCATOR, "Resolving hostname '" << s << "' via DNS for IPv6");
         auto response = IPLocator::resolveNameDNS(s);
 
         // Use the first valid IPv6 address that we can find
         if (response.second.size() > 0)
         {
             s = response.second.begin()->data();
+            EPROSIMA_LOG_INFO(IP_LOCATOR, "Hostname '" << ipv6 << "' resolved to IPv6: " << s);
             // Redundant check for extra security (here a custom regex is used instead of asio's verification)
             if (!IPLocator::isIPv6(s))
             {

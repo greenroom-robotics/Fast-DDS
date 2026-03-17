@@ -37,6 +37,7 @@
 #include <nlohmann/json.hpp>
 
 #include <fastdds/dds/core/ReturnCode.hpp>
+#include <fastdds/dds/log/Log.hpp>
 #include <fastdds/utils/IPFinder.hpp>
 #include <utils/threading.hpp>
 
@@ -297,11 +298,16 @@ bool SystemInfo::update_interfaces()
     auto ret = IPFinder::getIPs(&ifaces, true);
     if (ret)
     {
+        EPROSIMA_LOG_INFO(SYSTEM_INFO, "Caching " << ifaces.size() << " network interfaces");
         std::lock_guard<std::mutex> lock(interfaces_mtx_);
         // Copy fetched interfaces to attribute
         interfaces_ = ifaces;
         // Set to true when successful, but not to false if lookup failed (may have been successfully cached before)
         cached_interfaces_ = true;
+    }
+    else
+    {
+        EPROSIMA_LOG_WARNING(SYSTEM_INFO, "Failed to enumerate network interfaces");
     }
     return ret;
 }
