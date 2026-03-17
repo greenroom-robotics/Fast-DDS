@@ -156,9 +156,6 @@ DomainParticipant* DomainParticipantFactory::create_participant(
         DomainParticipantListener* listener,
         const StatusMask& mask)
 {
-    EPROSIMA_LOG_ERROR(DOMAIN, "TEST: EPROSIMA_LOG_ERROR is working");
-    EPROSIMA_LOG_WARNING(DOMAIN, "TEST: EPROSIMA_LOG_WARNING is working");
-    EPROSIMA_LOG_INFO(DOMAIN, "TEST: EPROSIMA_LOG_INFO is working");
     EPROSIMA_LOG_INFO(DOMAIN, "Creating DomainParticipant on domain " << did);
     load_profiles();
 
