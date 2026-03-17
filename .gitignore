@@ -446,4 +446,4 @@ compile_commands.json
 # Uncrustify
 uncrustify.cfg
 install
-log
+/log/
