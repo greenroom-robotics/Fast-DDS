@@ -440,11 +440,8 @@ eProsimaUDPSocket UDPv6Transport::OpenAndBindInputSocket(
 
         return socket;
     }
-    catch (asio::system_error const& e)
+    catch (asio::system_error const&)
     {
-        EPROSIMA_LOG_WARNING(TRANSPORT_UDPV6,
-                "Failed to open/bind UDPv6 input socket on " << sIp << ":" << port
-                        << " - " << e.what());
         throw;
     }
 }

@@ -438,11 +438,8 @@ eProsimaUDPSocket UDPv4Transport::OpenAndBindInputSocket(
         getSocketPtr(socket)->bind(generate_endpoint(sIp, port));
         return socket;
     }
-    catch (asio::system_error const& e)
+    catch (asio::system_error const&)
     {
-        EPROSIMA_LOG_WARNING(TRANSPORT_UDPV4,
-                "Failed to open/bind UDPv4 input socket on " << sIp << ":" << port
-                        << " - " << e.what());
         throw;
     }
 }
