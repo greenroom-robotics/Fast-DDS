@@ -42,7 +42,7 @@ struct LogResources
         , current_loop_(0)
         , filenames_(false)
         , functions_(true)
-        , verbosity_(Log::Error)
+        , verbosity_(Log::Info)
     {
 #if STDOUTERR_LOG_CONSUMER
         consumers_.emplace_back(new StdoutErrConsumer);
