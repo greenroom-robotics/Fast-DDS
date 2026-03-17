@@ -163,7 +163,8 @@ void EDPBasePUBListener::add_writer_from_change(
     {
         EPROSIMA_LOG_WARNING(RTPS_EDP,
                 "Failed to deserialize WriterProxyData from writer " << type_server
-                        << " with vendor_id " << change->vendor_id);
+                        << " with vendor_id 0x" << std::hex << static_cast<int>(change->vendor_id[0])
+                        << " 0x" << static_cast<int>(change->vendor_id[1]));
     }
 }
 
@@ -314,7 +315,8 @@ void EDPBaseSUBListener::add_reader_from_change(
     {
         EPROSIMA_LOG_WARNING(RTPS_EDP,
                 "Failed to deserialize ReaderProxyData from writer " << type_server
-                        << " with vendor_id " << change->vendor_id);
+                        << " with vendor_id 0x" << std::hex << static_cast<int>(change->vendor_id[0])
+                        << " 0x" << static_cast<int>(change->vendor_id[1]));
     }
 }
 

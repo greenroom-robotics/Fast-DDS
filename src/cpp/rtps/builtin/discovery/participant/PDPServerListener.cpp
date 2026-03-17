@@ -316,8 +316,9 @@ void PDPServerListener::on_new_cache_change_added(
         else
         {
             EPROSIMA_LOG_WARNING(RTPS_PDP_LISTENER,
-                    "Failed to deserialize participant DATA(p) from vendor_id "
-                            << change_in->vendor_id);
+                    "Failed to deserialize participant DATA(p) from vendor_id 0x"
+                            << std::hex << static_cast<int>(change_in->vendor_id[0])
+                            << " 0x" << static_cast<int>(change_in->vendor_id[1]));
         }
     }
     // DATA(Up) case
