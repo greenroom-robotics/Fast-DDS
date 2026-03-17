@@ -214,6 +214,10 @@ bool UDPTransportInterface::OpenAndBindInputSockets(
         std::vector<std::string> vInterfaces = get_binding_interfaces_list();
         for (std::string sInterface : vInterfaces)
         {
+            EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                    "Binding input socket on interface " << sInterface
+                            << " port " << IPLocator::getPhysicalPort(locator)
+                            << (is_multicast ? " (multicast)" : " (unicast)"));
             UDPChannelResource* p_channel_resource;
             p_channel_resource = CreateInputChannelResource(sInterface, locator, is_multicast, maxMsgSize, receiver);
             mInputSockets[IPLocator::getPhysicalPort(locator)].push_back(p_channel_resource);
@@ -359,6 +363,8 @@ bool UDPTransportInterface::OpenOutputChannel(
             // Create sockets for outbounding multicast for the other found network interfaces.
             if (!locNames.empty())
             {
+                EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                        "Creating output sockets on " << locNames.size() << " network interface(s)");
                 // Create other socket for outbounding rest of interfaces.
                 for (auto locIt = locNames.begin(); locIt != locNames.end(); ++locIt)
                 {
@@ -389,6 +395,8 @@ bool UDPTransportInterface::OpenOutputChannel(
             {
                 if (is_interface_allowed(infoIP.name))
                 {
+                    EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                            "Opening output channel on allowed interface " << infoIP.name);
                     eProsimaUDPSocket unicastSocket =
                             OpenAndBindUnicastOutputSocket(generate_endpoint(infoIP.name,
                                     port), port, infoIP.masked_locator);
@@ -406,16 +414,10 @@ bool UDPTransportInterface::OpenOutputChannel(
     }
     catch (asio::system_error const& e)
     {
-        (void)e;
-        /* TODO Que hacer?
-           EPROSIMA_LOG_ERROR(TRANSPORT_UDP, "UDPTransport Error binding at port: (" << IPLocator::getPhysicalPort(locator) << ")"
-            << " with msg: " << e.what());
-           for (auto& socket : mOutputSockets)
-           {
-            delete socket;
-           }
-           mOutputSockets.clear();
-         */
+        EPROSIMA_LOG_WARNING(TRANSPORT_UDP,
+                "UDPTransport Error binding at port: ("
+                        << IPLocator::getPhysicalPort(locator) << ")"
+                        << " with msg: " << e.what());
         return false;
     }
 
@@ -467,6 +469,8 @@ bool UDPTransportInterface::transform_remote_locator(
         }
 
         // If we get here, the locator is a local unicast address
+        EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                "Remote locator " << remote_locator << " detected as local, checking transformation options");
 
         // Attempt conversion to localhost if remote transport listening on it allows it
         if (allowed_remote_localhost)
@@ -477,18 +481,25 @@ bool UDPTransportInterface::transform_remote_locator(
             {
                 // Locator localhost is in the whitelist, so use localhost instead of remote_locator
                 fill_local_ip(result_locator);
+                EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                        "Transformed local locator " << remote_locator << " to localhost");
                 return true;
             }
             else if (allowed_local_localhost)
             {
                 // Abort transformation if localhost not allowed by this transport, but it is by other local transport
                 // and the remote one.
+                EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                        "Localhost not allowed by this transport for locator " << remote_locator
+                                << ", deferring to other transport");
                 return false;
             }
         }
 
         if (!is_locator_allowed(result_locator))
         {
+            EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                    "Locator " << remote_locator << " not allowed by interface whitelist");
             // Neither original remote locator nor localhost allowed: abort.
             return false;
         }
@@ -782,6 +793,8 @@ void UDPTransportInterface::get_unknown_network_interfaces(
     if (rescan_interfaces_)
     {
         get_ips(locNames, return_loopback, false);
+        EPROSIMA_LOG_INFO(TRANSPORT_UDP,
+                "Scanning network interfaces: found " << locNames.size() << " candidate(s)");
         for (auto& sender_resource : sender_resource_list)
         {
             UDPSenderResource* udp_sender_resource = UDPSenderResource::cast(*this, sender_resource.get());

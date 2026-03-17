@@ -150,6 +150,8 @@ void PDPServerListener::on_new_cache_change_added(
             auto ret = check_server_discovery_conditions(participant_data, participant_type_str);
             if (!ret.first)
             {
+                EPROSIMA_LOG_WARNING(RTPS_PDP_LISTENER,
+                        "Server discovery conditions not met for participant " << guid);
                 return;
             }
             EPROSIMA_LOG_INFO(RTPS_PDP_LISTENER, "Participant type " << participant_type_str);
@@ -310,6 +312,12 @@ void PDPServerListener::on_new_cache_change_added(
 
             // Take again the reader lock
             reader->getMutex().lock();
+        }
+        else
+        {
+            EPROSIMA_LOG_WARNING(RTPS_PDP_LISTENER,
+                    "Failed to deserialize participant DATA(p) from vendor_id "
+                            << change_in->vendor_id);
         }
     }
     // DATA(Up) case

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(git fetch:*)",
+      "Bash(find /home/tenzin/Repositories/Fast-DDS/src/cpp/rtps/transport -name \"*.cpp\" -exec grep -l \"TCP\\\\|UDP\" {})",
+      "Bash(grep -v \"^--$\")",
+      "Bash(grep -v \"EPROSIMA_LOG\\\\|if\\\\|{\\\\|}\\\\|^$\")"
+    ]
+  }
+}

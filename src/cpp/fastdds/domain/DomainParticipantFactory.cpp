@@ -102,6 +102,7 @@ std::shared_ptr<DomainParticipantFactory> DomainParticipantFactory::get_shared_i
 ReturnCode_t DomainParticipantFactory::delete_participant(
         DomainParticipant* part)
 {
+    EPROSIMA_LOG_INFO(DOMAIN, "Deleting DomainParticipant");
     using PartVectorIt = std::vector<DomainParticipantImpl*>::iterator;
     using VectorIt = std::map<DomainId_t, std::vector<DomainParticipantImpl*>>::iterator;
 
@@ -155,6 +156,7 @@ DomainParticipant* DomainParticipantFactory::create_participant(
         DomainParticipantListener* listener,
         const StatusMask& mask)
 {
+    EPROSIMA_LOG_INFO(DOMAIN, "Creating DomainParticipant on domain " << did);
     load_profiles();
 
     const DomainParticipantQos& pqos = (&qos == &PARTICIPANT_QOS_DEFAULT) ? default_participant_qos_ : qos;
@@ -169,6 +171,7 @@ DomainParticipant* DomainParticipantFactory::create_participant(
 
     if (fastdds::rtps::GUID_t::unknown() != dom_part_impl->guid())
     {
+        EPROSIMA_LOG_INFO(DOMAIN, "DomainParticipant created, GUID: " << dom_part_impl->guid());
         {
             std::lock_guard<std::mutex> guard(mtx_participants_);
             using VectorIt = std::map<DomainId_t, std::vector<DomainParticipantImpl*>>::iterator;
@@ -196,6 +199,7 @@ DomainParticipant* DomainParticipantFactory::create_participant(
     }
     else
     {
+        EPROSIMA_LOG_WARNING(DOMAIN, "DomainParticipant creation failed on domain " << did);
         delete dom_part_impl;
         return nullptr;
     }

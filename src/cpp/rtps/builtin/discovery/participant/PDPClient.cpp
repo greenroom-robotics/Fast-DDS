@@ -190,7 +190,12 @@ ParticipantProxyData* PDPClient::createParticipantProxyData(
     }
 
     ParticipantProxyData* pdata = add_participant_proxy_data(participant_data.guid, is_server, &participant_data);
-    if (pdata != nullptr)
+    if (pdata == nullptr)
+    {
+        EPROSIMA_LOG_WARNING(RTPS_PDP,
+                "Failed to add participant proxy data for " << participant_data.guid);
+    }
+    else
     {
         // Clients only assert its server liveliness, other clients liveliness is provided
         // through server's PDP discovery data

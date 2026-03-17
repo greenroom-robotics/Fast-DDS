@@ -338,7 +338,10 @@ TCPTransactionId RTCPMessageManager::sendOpenLogicalPortRequest(
     request.serialize(&payload);
     EPROSIMA_LOG_INFO(RTCP_MSG, "Send [OPEN_LOGICAL_PORT_REQUEST] LogicalPort: " << request.logicalPort());
     TCPTransactionId id = getTransactionId();
-    sendData(channel, OPEN_LOGICAL_PORT_REQUEST, id, &payload);
+    if (!sendData(channel, OPEN_LOGICAL_PORT_REQUEST, id, &payload))
+    {
+        EPROSIMA_LOG_WARNING(RTCP, "Failed sending OpenLogicalPort Request");
+    }
     return id;
 }
 
@@ -359,7 +362,10 @@ TCPTransactionId RTCPMessageManager::sendCheckLogicalPortsRequest(
     request.serialize(&payload);
     EPROSIMA_LOG_INFO(RTCP_MSG, "Send [CHECK_LOGICAL_PORT_REQUEST]");
     TCPTransactionId id = getTransactionId();
-    sendData(channel, CHECK_LOGICAL_PORT_REQUEST, id, &payload);
+    if (!sendData(channel, CHECK_LOGICAL_PORT_REQUEST, id, &payload))
+    {
+        EPROSIMA_LOG_WARNING(RTCP, "Failed sending CheckLogicalPorts Request");
+    }
     return id;
 }
 
@@ -371,7 +377,10 @@ TCPTransactionId RTCPMessageManager::sendKeepAliveRequest(
     request.serialize(&payload);
     EPROSIMA_LOG_INFO(RTCP_MSG, "Send [KEEP_ALIVE_REQUEST]");
     TCPTransactionId id = getTransactionId();
-    sendData(channel, KEEP_ALIVE_REQUEST, id, &payload, RETCODE_VOID);
+    if (!sendData(channel, KEEP_ALIVE_REQUEST, id, &payload, RETCODE_VOID))
+    {
+        EPROSIMA_LOG_WARNING(RTCP, "Failed sending KeepAlive Request");
+    }
     return id;
 }
 
@@ -393,7 +402,10 @@ TCPTransactionId RTCPMessageManager::sendLogicalPortIsClosedRequest(
     request.serialize(&payload);
     EPROSIMA_LOG_INFO(RTCP_MSG, "Send [LOGICAL_PORT_IS_CLOSED_REQUEST] LogicalPort: " << request.logicalPort());
     TCPTransactionId id = getTransactionId();
-    sendData(channel, LOGICAL_PORT_IS_CLOSED_REQUEST, id, &payload);
+    if (!sendData(channel, LOGICAL_PORT_IS_CLOSED_REQUEST, id, &payload))
+    {
+        EPROSIMA_LOG_WARNING(RTCP, "Failed sending LogicalPortIsClosed Request");
+    }
     return id;
 }
 
@@ -411,7 +423,10 @@ TCPTransactionId RTCPMessageManager::sendUnbindConnectionRequest(
 {
     EPROSIMA_LOG_INFO(RTCP_MSG, "Send [UNBIND_CONNECTION_REQUEST]");
     TCPTransactionId id = getTransactionId();
-    sendData(channel, UNBIND_CONNECTION_REQUEST, id);
+    if (!sendData(channel, UNBIND_CONNECTION_REQUEST, id))
+    {
+        EPROSIMA_LOG_WARNING(RTCP, "Failed sending UnbindConnection Request");
+    }
     return id;
 }
 
@@ -479,17 +494,26 @@ ResponseCode RTCPMessageManager::processOpenLogicalPortRequest(
             channel->connection_status_ != TCPChannelResource::eConnectionStatus::eWaitingForBindResponse)
     {
         EPROSIMA_LOG_ERROR(RTCP, "Trying to send [OPEN_LOGICAL_PORT_RESPONSE] without connection established.");
-        sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR);
+        if (!sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending CHECK_LOGICAL_PORT_RESPONSE with RETCODE_SERVER_ERROR");
+        }
     }
     else if (request.logicalPort() == 0 || !mTransport->is_input_port_open(request.logicalPort()))
     {
         EPROSIMA_LOG_INFO(RTCP_MSG, "Send [OPEN_LOGICAL_PORT_RESPONSE] Not found: " << request.logicalPort());
-        sendData(channel, OPEN_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_INVALID_PORT);
+        if (!sendData(channel, OPEN_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_INVALID_PORT))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending OPEN_LOGICAL_PORT_RESPONSE with RETCODE_INVALID_PORT");
+        }
     }
     else
     {
         EPROSIMA_LOG_INFO(RTCP_MSG, "Send [OPEN_LOGICAL_PORT_RESPONSE] Found: " << request.logicalPort());
-        sendData(channel, OPEN_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_OK);
+        if (!sendData(channel, OPEN_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_OK))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending OPEN_LOGICAL_PORT_RESPONSE with RETCODE_OK");
+        }
     }
     return RETCODE_OK;
 }
@@ -502,7 +526,10 @@ void RTCPMessageManager::processCheckLogicalPortsRequest(
     CheckLogicalPortsResponse_t response;
     if (!channel->connection_established())
     {
-        sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR);
+        if (!sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending CHECK_LOGICAL_PORT_RESPONSE with RETCODE_SERVER_ERROR");
+        }
     }
     else
     {
@@ -529,7 +556,10 @@ void RTCPMessageManager::processCheckLogicalPortsRequest(
         SerializedPayload_t payload(static_cast<uint32_t>(
                     CheckLogicalPortsResponse_t::getBufferCdrSerializedSize(response)));
         response.serialize(&payload);
-        sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, &payload, RETCODE_OK);
+        if (!sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, &payload, RETCODE_OK))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending CHECK_LOGICAL_PORT_RESPONSE with RETCODE_OK");
+        }
     }
 }
 
@@ -540,15 +570,24 @@ ResponseCode RTCPMessageManager::processKeepAliveRequest(
 {
     if (!channel->connection_established())
     {
-        sendData(channel, KEEP_ALIVE_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR);
+        if (!sendData(channel, KEEP_ALIVE_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending KEEP_ALIVE_RESPONSE with RETCODE_SERVER_ERROR");
+        }
     }
     else if (IPLocator::getLogicalPort(channel->locator()) == IPLocator::getLogicalPort(request.locator()))
     {
-        sendData(channel, KEEP_ALIVE_RESPONSE, transaction_id, nullptr, RETCODE_OK);
+        if (!sendData(channel, KEEP_ALIVE_RESPONSE, transaction_id, nullptr, RETCODE_OK))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending KEEP_ALIVE_RESPONSE with RETCODE_OK");
+        }
     }
     else
     {
-        sendData(channel, KEEP_ALIVE_RESPONSE, transaction_id, nullptr, RETCODE_UNKNOWN_LOCATOR);
+        if (!sendData(channel, KEEP_ALIVE_RESPONSE, transaction_id, nullptr, RETCODE_UNKNOWN_LOCATOR))
+        {
+            EPROSIMA_LOG_WARNING(RTCP, "Failed sending KEEP_ALIVE_RESPONSE with RETCODE_UNKNOWN_LOCATOR");
+        }
         return RETCODE_UNKNOWN_LOCATOR;
     }
     return RETCODE_OK;
@@ -561,7 +600,11 @@ void RTCPMessageManager::processLogicalPortIsClosedRequest(
 {
     if (!channel->connection_established())
     {
-        sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR);
+        if (!sendData(channel, CHECK_LOGICAL_PORT_RESPONSE, transaction_id, nullptr, RETCODE_SERVER_ERROR))
+        {
+            EPROSIMA_LOG_WARNING(RTCP,
+                    "Failed sending CHECK_LOGICAL_PORT_RESPONSE with RETCODE_SERVER_ERROR for LogicalPortIsClosed");
+        }
     }
     else
     {

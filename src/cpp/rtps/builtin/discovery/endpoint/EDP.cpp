@@ -185,6 +185,10 @@ bool EDP::new_reader_proxy_data(
                             0 < content_filter->filter_expression.size()
                             ))
                     {
+                        EPROSIMA_LOG_WARNING(RTPS_EDP,
+                                "Invalid ContentFilterProperty for reader "
+                                        << rtps_reader->getGuid().entityId << " in topic "
+                                        << topic.topic_name.to_string());
                         return false;
                     }
 
@@ -213,6 +217,8 @@ bool EDP::new_reader_proxy_data(
         rtps_reader->getGuid(), participant_guid, init_fun);
     if (reader_data == nullptr)
     {
+        EPROSIMA_LOG_WARNING(RTPS_EDP,
+                "Failed to add reader proxy data for " << rtps_reader->getGuid());
         return false;
     }
 
@@ -331,6 +337,10 @@ dds::ReturnCode_t EDP::new_reader_proxy_data(
                             0 < content_filter->filter_expression.size()
                             ))
                     {
+                        EPROSIMA_LOG_WARNING(RTPS_EDP,
+                                "Invalid ContentFilterProperty for reader "
+                                        << rtps_reader->getGuid().entityId << " in topic "
+                                        << topic.topic_name.to_string());
                         return false;
                     }
 
@@ -359,6 +369,8 @@ dds::ReturnCode_t EDP::new_reader_proxy_data(
         rtps_reader->getGuid(), participant_guid, init_fun);
     if (reader_data == nullptr)
     {
+        EPROSIMA_LOG_WARNING(RTPS_EDP,
+                "Failed to add reader proxy data for " << rtps_reader->getGuid());
         return dds::RETCODE_ERROR;
     }
     reader_data->should_send_optional_qos(should_send_opt_qos);

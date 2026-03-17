@@ -19,7 +19,7 @@
 
 #include <rtps/builtin/discovery/participant/DirectMessageSender.hpp>
 
-
+#include <fastdds/dds/log/Log.hpp>
 #include <fastdds/rtps/writer/RTPSWriter.hpp>
 #include <fastdds/utils/IPLocator.hpp>
 
@@ -102,8 +102,13 @@ bool DirectMessageSender::send(
         const uint32_t& total_bytes,
         std::chrono::steady_clock::time_point max_blocking_time_point) const
 {
-    return participant_->sendSync(buffers, total_bytes, participant_->getGuid(),
+    bool ret = participant_->sendSync(buffers, total_bytes, participant_->getGuid(),
                    Locators(locators_->begin()), Locators(locators_->end()), max_blocking_time_point);
+    if (!ret)
+    {
+        EPROSIMA_LOG_WARNING(RTPS_PDP, "DirectMessageSender failed to send " << total_bytes << " bytes");
+    }
+    return ret;
 }
 
 } /* namespace rtps */

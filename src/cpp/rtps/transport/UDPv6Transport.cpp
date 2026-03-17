@@ -44,6 +44,7 @@ static bool get_ipv6s(
 {
     if (!SystemInfo::get_ips(locNames, return_loopback, force_lookup))
     {
+        EPROSIMA_LOG_WARNING(TRANSPORT_UDPV6, "Failed to retrieve IPv6 network interfaces");
         return false;
     }
     // Controller out IP4
@@ -167,6 +168,8 @@ UDPv6Transport::UDPv6Transport(
             }
             else if (descriptor.interfaceWhiteList.empty() && descriptor.interface_allowlist.empty())
             {
+                EPROSIMA_LOG_INFO(TRANSPORT_UDPV6,
+                        "Accepting interface " << infoIP.dev << ": " << infoIP.name);
                 interface_whitelist_.emplace_back(ip::make_address_v6(infoIP.name));
                 allowed_interfaces_.emplace_back(infoIP.dev, infoIP.name, infoIP.masked_locator,
                         descriptor.netmask_filter);
@@ -187,6 +190,8 @@ UDPv6Transport::UDPv6Transport(
                     if (network::netmask_filter::validate_and_transform(netmask_filter,
                             descriptor.netmask_filter))
                     {
+                        EPROSIMA_LOG_INFO(TRANSPORT_UDPV6,
+                                "Accepting allowed interface " << infoIP.dev << ": " << infoIP.name);
                         interface_whitelist_.emplace_back(ip::make_address_v6(infoIP.name));
                         allowed_interfaces_.emplace_back(infoIP.dev, infoIP.name, infoIP.masked_locator,
                                 netmask_filter);
@@ -208,6 +213,8 @@ UDPv6Transport::UDPv6Transport(
                             return whitelist_element == infoIP.dev || compare_ips(whitelist_element, infoIP.name);
                         }) != white_end )
                 {
+                    EPROSIMA_LOG_INFO(TRANSPORT_UDPV6,
+                            "Accepting whitelisted interface " << infoIP.dev << ": " << infoIP.name);
                     interface_whitelist_.emplace_back(ip::make_address_v6(infoIP.name));
                     allowed_interfaces_.emplace_back(infoIP.dev, infoIP.name, infoIP.masked_locator,
                             descriptor.netmask_filter);
@@ -391,45 +398,55 @@ eProsimaUDPSocket UDPv6Transport::OpenAndBindInputSocket(
         uint16_t port,
         bool is_multicast)
 {
-    eProsimaUDPSocket socket = createUDPSocket(io_context_);
-    getSocketPtr(socket)->open(generate_protocol());
-    if (mReceiveBufferSize != 0)
+    try
     {
-        uint32_t configured_value = 0;
-        uint32_t minimum_value = configuration()->maxMessageSize;
-        if (!asio_helpers::asio_helpers::try_setting_buffer_size<asio::socket_base::receive_buffer_size>(
-                    socket, mReceiveBufferSize, minimum_value, configured_value))
+        eProsimaUDPSocket socket = createUDPSocket(io_context_);
+        getSocketPtr(socket)->open(generate_protocol());
+        if (mReceiveBufferSize != 0)
         {
-            EPROSIMA_LOG_ERROR(TRANSPORT_UDPV6,
-                    "Couldn't set receive buffer size to minimum value: " << minimum_value);
+            uint32_t configured_value = 0;
+            uint32_t minimum_value = configuration()->maxMessageSize;
+            if (!asio_helpers::asio_helpers::try_setting_buffer_size<asio::socket_base::receive_buffer_size>(
+                        socket, mReceiveBufferSize, minimum_value, configured_value))
+            {
+                EPROSIMA_LOG_ERROR(TRANSPORT_UDPV6,
+                        "Couldn't set receive buffer size to minimum value: " << minimum_value);
+            }
+            else if (mReceiveBufferSize != configured_value)
+            {
+                EPROSIMA_LOG_WARNING(TRANSPORT_UDPV6,
+                        "Receive buffer size could not be set to the desired value. "
+                        << "Using " << configured_value << " instead of " << mReceiveBufferSize);
+            }
         }
-        else if (mReceiveBufferSize != configured_value)
-        {
-            EPROSIMA_LOG_WARNING(TRANSPORT_UDPV6,
-                    "Receive buffer size could not be set to the desired value. "
-                    << "Using " << configured_value << " instead of " << mReceiveBufferSize);
-        }
-    }
 
-    if (is_multicast)
-    {
-        getSocketPtr(socket)->set_option(ip::udp::socket::reuse_address(true));
+        if (is_multicast)
+        {
+            getSocketPtr(socket)->set_option(ip::udp::socket::reuse_address(true));
 #if defined(__QNX__)
-        getSocketPtr(socket)->set_option(asio::detail::socket_option::boolean<
-                    ASIO_OS_DEF(SOL_SOCKET), SO_REUSEPORT>(true));
+            getSocketPtr(socket)->set_option(asio::detail::socket_option::boolean<
+                        ASIO_OS_DEF(SOL_SOCKET), SO_REUSEPORT>(true));
 #endif // if defined(__QNX__)
-    }
-    else
-    {
+        }
+        else
+        {
 #if defined(_WIN32)
-        getSocketPtr(socket)->set_option(asio::detail::socket_option::integer<
-                    ASIO_OS_DEF(SOL_SOCKET), SO_EXCLUSIVEADDRUSE>(1));
+            getSocketPtr(socket)->set_option(asio::detail::socket_option::integer<
+                        ASIO_OS_DEF(SOL_SOCKET), SO_EXCLUSIVEADDRUSE>(1));
 #endif // if defined(_WIN32)
+        }
+
+        getSocketPtr(socket)->bind(generate_endpoint(sIp, port));
+
+        return socket;
     }
-
-    getSocketPtr(socket)->bind(generate_endpoint(sIp, port));
-
-    return socket;
+    catch (asio::system_error const& e)
+    {
+        EPROSIMA_LOG_WARNING(TRANSPORT_UDPV6,
+                "Failed to open/bind UDPv6 input socket on " << sIp << ":" << port
+                        << " - " << e.what());
+        throw;
+    }
 }
 
 bool UDPv6Transport::OpenInputChannel(
@@ -440,6 +457,8 @@ bool UDPv6Transport::OpenInputChannel(
     std::unique_lock<std::recursive_mutex> scopedLock(mInputMapMutex);
     if (!is_locator_allowed(locator))
     {
+        EPROSIMA_LOG_INFO(TRANSPORT_UDPV6,
+                "Input channel not opened: locator " << locator << " not allowed by interface configuration");
         return false;
     }
 
@@ -447,6 +466,8 @@ bool UDPv6Transport::OpenInputChannel(
 
     if (!IsInputChannelOpen(locator))
     {
+        EPROSIMA_LOG_INFO(TRANSPORT_UDPV6,
+                "Opening input channel for locator " << locator);
         success = OpenAndBindInputSockets(locator, receiver, IPLocator::isMulticast(locator), maxMsgSize);
     }
 

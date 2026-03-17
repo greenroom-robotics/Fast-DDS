@@ -288,6 +288,7 @@ RTPSParticipantImpl::RTPSParticipantImpl(
 
     if (!setup_transports())
     {
+        EPROSIMA_LOG_WARNING(RTPS_PARTICIPANT, "Transport setup failed");
         return;
     }
 
@@ -297,6 +298,7 @@ RTPSParticipantImpl::RTPSParticipantImpl(
     // Start security
     if (!m_security_manager.init(security_attributes_, m_att.properties))
     {
+        EPROSIMA_LOG_WARNING(RTPS_PARTICIPANT, "Security manager initialization failed");
         // Participant will be deleted, no need to allocate buffers or create builtin endpoints
         return;
     }
@@ -496,6 +498,8 @@ bool RTPSParticipantImpl::setup_transports()
 
         if (transport_registered)
         {
+            EPROSIMA_LOG_INFO(RTPS_PARTICIPANT,
+                    "Transport registered successfully for participant " << m_att.getName());
             has_shm_transport_ |=
                     (dynamic_cast<SharedMemTransportDescriptor*>(transportDescriptor.get()) != nullptr);
         }
@@ -781,6 +785,7 @@ void RTPSParticipantImpl::disable()
 
 RTPSParticipantImpl::~RTPSParticipantImpl()
 {
+    EPROSIMA_LOG_INFO(RTPS_PARTICIPANT, "Destroying RTPSParticipant " << getGuid());
     disable();
 
 #if HAVE_SECURITY

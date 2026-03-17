@@ -159,6 +159,12 @@ void EDPBasePUBListener::add_writer_from_change(
         // Take the reader lock again if needed.
         reader->getMutex().lock();
     }
+    else
+    {
+        EPROSIMA_LOG_WARNING(RTPS_EDP,
+                "Failed to deserialize WriterProxyData from writer " << type_server
+                        << " with vendor_id " << change->vendor_id);
+    }
 }
 
 void EDPSimplePUBListener::on_new_cache_change_added(
@@ -303,6 +309,12 @@ void EDPBaseSUBListener::add_reader_from_change(
 
         // Take the reader lock again if needed.
         reader->getMutex().lock();
+    }
+    else
+    {
+        EPROSIMA_LOG_WARNING(RTPS_EDP,
+                "Failed to deserialize ReaderProxyData from writer " << type_server
+                        << " with vendor_id " << change->vendor_id);
     }
 }
 

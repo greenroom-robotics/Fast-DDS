@@ -26,6 +26,7 @@ char dummy;
 } // namespace
 #endif // ifdef _WIN32
 
+#include <fastdds/dds/log/Log.hpp>
 #include <fastdds/rtps/common/CdrSerialization.hpp>
 #include <fastdds/rtps/common/Types.hpp>
 #include <fastdds/rtps/common/VendorId_t.hpp>
@@ -159,8 +160,9 @@ bool ConnectionRequest_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "ConnectionRequest_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -184,8 +186,9 @@ bool ConnectionRequest_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "ConnectionRequest_t deserialization failed: " << exception.what());
         return false;
     }
 
@@ -247,8 +250,9 @@ bool OpenLogicalPortRequest_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "OpenLogicalPortRequest_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -272,8 +276,9 @@ bool OpenLogicalPortRequest_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "OpenLogicalPortRequest_t deserialization failed: " << exception.what());
         return false;
     }
 
@@ -336,8 +341,9 @@ bool CheckLogicalPortsRequest_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "CheckLogicalPortsRequest_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -361,8 +367,9 @@ bool CheckLogicalPortsRequest_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "CheckLogicalPortsRequest_t deserialization failed: " << exception.what());
         return false;
     }
 
@@ -424,8 +431,9 @@ bool KeepAliveRequest_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "KeepAliveRequest_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -449,8 +457,9 @@ bool KeepAliveRequest_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "KeepAliveRequest_t deserialization failed: " << exception.what());
         return false;
     }
 
@@ -512,8 +521,9 @@ bool LogicalPortIsClosedRequest_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "LogicalPortIsClosedRequest_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -537,8 +547,9 @@ bool LogicalPortIsClosedRequest_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "LogicalPortIsClosedRequest_t deserialization failed: " << exception.what());
         return false;
     }
 
@@ -600,8 +611,9 @@ bool BindConnectionResponse_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "BindConnectionResponse_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -625,8 +637,9 @@ bool BindConnectionResponse_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "BindConnectionResponse_t deserialization failed: " << exception.what());
         return false;
     }
 
@@ -689,8 +702,9 @@ bool CheckLogicalPortsResponse_t::serialize(
         ser.serialize_encapsulation();
         p_type->serialize(ser); // Serialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "CheckLogicalPortsResponse_t serialization failed: " << exception.what());
         return false;
     }
 
@@ -714,8 +728,9 @@ bool CheckLogicalPortsResponse_t::deserialize(
         payload->encapsulation = deser.endianness() == eprosima::fastcdr::Cdr::BIG_ENDIANNESS ? CDR_BE : CDR_LE;
         p_type->deserialize(deser); //Deserialize the object:
     }
-    catch (eprosima::fastcdr::exception::Exception& /*exception*/)
+    catch (eprosima::fastcdr::exception::Exception& exception)
     {
+        EPROSIMA_LOG_WARNING(RTCP_MSG, "CheckLogicalPortsResponse_t deserialization failed: " << exception.what());
         return false;
     }
 

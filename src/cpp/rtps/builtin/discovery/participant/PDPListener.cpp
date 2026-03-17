@@ -119,6 +119,8 @@ void PDPListener::on_new_cache_change_added(
 
             if (!check_discovery_conditions(temp_participant_data_))
             {
+                EPROSIMA_LOG_WARNING(RTPS_PDP_LISTENER,
+                        "Discovery conditions not met for participant " << guid);
                 return;
             }
 
